@@ -10,7 +10,7 @@
 - [ ] Dashboard
 - [x] View All User
 - [x] Roles
-- [ ] Permission
+- [x] Permission
 - [ ] Login
 - [x] 404 Not Found
 
@@ -21,8 +21,8 @@
 - [x] Assign Roles
 - [x] Add Roles
 - [x] Assign/Revoke Permissions
-- [ ] Add Permission
-- [ ] Remove Permission
+- [x] Add Permission
+- [x] Remove Permission
 
 ### Instructions
 
@@ -38,4 +38,4 @@
 - [ ] Implement Input validation for blank fields in all forms
 - [x] Implement Permission assignment to Roles
 - [ ] Implement Role Color Picker
-- [ ] Implement Permission Creation and Deletion
+- [x] Implement Permission Creation and Deletion
