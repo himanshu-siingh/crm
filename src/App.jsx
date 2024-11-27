@@ -7,6 +7,7 @@ import Roles from "./pages/user/Roles";
 import Permission from "./pages/user/Permission";
 import Dashboard from "./pages/common/dashboard";
 import Profile from "./pages/common/profile";
+import PastUser from "./pages/user/PastUser";
 
 const dynamicRoutes = [
   {
@@ -16,6 +17,10 @@ const dynamicRoutes = [
   {
     path: "/users",
     element: <AllUser />,
+  },
+  {
+    path: "/user/past",
+    element: <PastUser />,
   },
   {
     path: "/user/role",
@@ -41,7 +46,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           {dynamicRoutes.map((route, index) => (
-            <Route path={route.path} element={route.element} />
+            <Route key={index} path={route.path} element={route.element} />
           ))}
         </Route>
       </Routes>

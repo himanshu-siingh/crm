@@ -1,7 +1,17 @@
-import { Button, Input, Modal, Space, Table, Tag, Typography } from "antd";
+import {
+  Button,
+  Input,
+  message,
+  Modal,
+  Space,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
 const { Text, Title } = Typography;
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserAddOutlined } from "@ant-design/icons";
+import UserService from "../../services/request/user";
 
 const dummyData = [
   { id: 1, pageID: 1901, permission: "Ticket Management" },
@@ -16,8 +26,27 @@ const dummyData = [
   { id: 10, pageID: 1910, permission: "Collaboration with Teams" },
 ];
 
-const PermissionCreation = ({ isModalOpen, handleOk, handleCancel }) => {
+const PermissionCreation = ({
+  isModalOpen,
+  handleOk,
+  handleCancel,
+  setLoad,
+}) => {
   const [data, setData] = useState();
+
+  const addPermission = () => {
+    console.log(data);
+    UserService.createPermission(data, (res) => {
+      if (res.status) {
+        message.success("Permission added Succesfully");
+        setLoad((x) => !x);
+        handleOk();
+      } else {
+        message.error(res.message);
+      }
+    });
+  };
+
   return (
     <Modal
       title="Create Permission"
@@ -28,7 +57,7 @@ const PermissionCreation = ({ isModalOpen, handleOk, handleCancel }) => {
         <Button key="back" onClick={handleCancel}>
           Return
         </Button>,
-        <Button key="submit" type="primary" onClick={handleOk}>
+        <Button key="submit" type="primary" onClick={addPermission}>
           Submit
         </Button>,
       ]}
@@ -39,8 +68,8 @@ const PermissionCreation = ({ isModalOpen, handleOk, handleCancel }) => {
           Page ID <span className="text-red-600">*</span>
         </Title>
         <Input
-          value={data?.pageID}
-          onChange={({ target }) => setUser({ ...data, pageID: target.value })}
+          value={data?.pageId}
+          onChange={({ target }) => setData({ ...data, pageId: target.value })}
           placeholder="Ex- 1132"
           className="py-1"
         />
@@ -50,7 +79,7 @@ const PermissionCreation = ({ isModalOpen, handleOk, handleCancel }) => {
         <Input
           value={data?.permission}
           onChange={({ target }) =>
-            setUser({ ...data, permission: target.value })
+            setData({ ...data, permission: target.value })
           }
           placeholder="Ex - User List"
           className="py-1"
@@ -63,6 +92,7 @@ const PermissionCreation = ({ isModalOpen, handleOk, handleCancel }) => {
 const Permission = () => {
   const [rows, setRows] = useState(dummyData);
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
+  const [load, setLoad] = useState(false);
 
   const showPermissionModal = (id) => {
     setPermissionModalOpen(true);
@@ -73,7 +103,14 @@ const Permission = () => {
   const handlePermissionCancel = () => {
     setPermissionModalOpen(false);
   };
-
+  useEffect(() => {
+    UserService.getAllPermission((res) => {
+      if (res.status) {
+        setRows(res.data);
+        console.log(res.data);
+      }
+    });
+  }, [load]);
   const columns = [
     {
       title: "S.no",
@@ -82,8 +119,8 @@ const Permission = () => {
     },
     {
       title: "Page Id",
-      dataIndex: "pageID",
-      key: "pageID",
+      dataIndex: "pageId",
+      key: "pageId",
     },
     {
       title: "Permission",
@@ -99,7 +136,16 @@ const Permission = () => {
           <Space>
             <Button
               type="fn"
-              onClick={() => console.log(`Deleted ${id}`)}
+              onClick={() => {
+                UserService.deletePermission({ id }, (res) => {
+                  if (res.status) {
+                    message.success("Permission deleted Succesfully");
+                    setLoad(!load);
+                  } else {
+                    message.error("Failed to delete permission");
+                  }
+                });
+              }}
               className="text-blue-400 hover:text-blue-700"
             >
               Delete
@@ -148,6 +194,7 @@ const Permission = () => {
         isModalOpen={permissionModalOpen}
         handleOk={handlePermissionOk}
         handleCancel={handlePermissionCancel}
+        setLoad={setLoad}
       />
     </>
   );

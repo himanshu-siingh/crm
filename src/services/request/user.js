@@ -18,6 +18,12 @@ const UserService = {
       cb(res);
     });
   },
+  getPastUser: function (param, cb) {
+    //console.log(Urls.login);
+    APIService.post(Urls.getPastUser, param, (res) => {
+      cb(res);
+    });
+  },
   createUser: function (param, cb) {
     //console.log(Urls.login);
     APIService.post(Urls.createUser, param, (res) => {
@@ -29,13 +35,34 @@ const UserService = {
       cb(res);
     });
   },
+  getAllPermission: function (cb) {
+    APIService.post(Urls.getAllPermission, {}, (res) => {
+      cb(res);
+    });
+  },
   getRole: function (param, cb) {
     APIService.post(Urls.getRole, param, (res) => {
       cb(res);
     });
   },
+  getPermission: function (param, cb) {
+    APIService.post(Urls.getPermission, param, (res) => {
+      cb(res);
+    });
+  },
+
   createRole: function (param, cb) {
     APIService.post(Urls.createRoles, param, (res) => {
+      cb(res);
+    });
+  },
+  createPermission: function (param, cb) {
+    APIService.post(Urls.createPermission, param, (res) => {
+      cb(res);
+    });
+  },
+  deletePermission: function (param, cb) {
+    APIService.post(Urls.deletePermission, param, (res) => {
       cb(res);
     });
   },
@@ -44,8 +71,20 @@ const UserService = {
       cb(res);
     });
   },
+  assignPermission: function (param, cb) {
+    APIService.post(Urls.assignPermission, param, (res) => {
+      cb(res);
+    });
+  },
+
   changePassword: function (param, cb) {
     APIService.post(Urls.changePassword, param, (res) => {
+      cb(res);
+    });
+  },
+
+  changeStatus: function (param, cb) {
+    APIService.post(Urls.changeStatus, param, (res) => {
       cb(res);
     });
   },

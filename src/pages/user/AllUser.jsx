@@ -327,7 +327,20 @@ const AllUser = () => {
       render: (_, { id }) => {
         return (
           <Space>
-            <Button type="fn" className="text-blue-400 hover:text-blue-700">
+            <Button
+              type="fn"
+              className="text-blue-400 hover:text-blue-700"
+              onClick={() => {
+                UserService.changeStatus({ status: 2, userId: id }, (res) => {
+                  if (res.status) {
+                    message.success("User Deactivated");
+                    setLoad((x) => !x);
+                  } else {
+                    message.error("Failed to deactivate user");
+                  }
+                });
+              }}
+            >
               Deactivate
             </Button>
             <Button

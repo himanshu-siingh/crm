@@ -9,7 +9,7 @@
 
 - [ ] Dashboard
 - [x] View All User
-- [ ] Roles
+- [x] Roles
 - [ ] Permission
 - [ ] Login
 - [x] 404 Not Found
@@ -17,11 +17,10 @@
 ## Features
 
 - [x] Add User
-- [ ] Activate/Deactive User
+- [x] Activate/Deactive User
 - [x] Assign Roles
 - [x] Add Roles
-- [ ] Dump Roles
-- [ ] Assign/Revoke Permissions
+- [x] Assign/Revoke Permissions
 - [ ] Add Permission
 - [ ] Remove Permission
 
@@ -33,10 +32,10 @@
 - Use loader/spinner/skeleton in components to show loading
 - Every role have a defined color use Color Picker
 
-### Task for 23/11/2024
+### Task for 27/11/2024
 
-- [ ] Implement Deactivate/Activate User in Users List
+- [x] Implement Deactivate/Activate User in Users List
 - [ ] Implement Input validation for blank fields in all forms
-- [ ] Implement Permission assignment to Roles
+- [x] Implement Permission assignment to Roles
 - [ ] Implement Role Color Picker
 - [ ] Implement Permission Creation and Deletion
