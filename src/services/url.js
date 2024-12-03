@@ -1,4 +1,5 @@
 const base_url = `http://${window.location.hostname}:3110/api`;
+// const base_url = `https://apic-45dr.onrender.com/api`;
 
 const Urls = {
   login: base_url + "/login",
@@ -15,6 +16,16 @@ const Urls = {
   getAllPermission: base_url + "/permission",
   createPermission: base_url + "/permission/create",
   deletePermission: base_url + "/permission/delete",
+  getDepartment: base_url + "/department",
+  getEmployees: base_url + "/employees",
+  addEmployee: base_url + "/employee/add",
+  getEmployeeByDepart: base_url + "/employee/department",
+  deleteDepartment: base_url + "/department/delete",
+  createDepartment: base_url + "/department/add",
+  getDesigDepart: base_url + "/department/designation",
+  getDesignation: base_url + "/designation",
+  deleteDesignation: base_url + "/designation/delete",
+  createDesignation: base_url + "/designation/add",
 };
 
 export default Urls;

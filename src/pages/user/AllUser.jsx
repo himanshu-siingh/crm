@@ -15,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { UserAddOutlined } from "@ant-design/icons";
 import UserService from "../../services/request/user";
 import "./user.css";
+import EmployeeService from "../../services/request/employee";
 const dummyData = [
   {
     username: "user1",
@@ -86,11 +87,11 @@ const dummyData = [
 ];
 
 const UserCreation = React.memo(
-  ({ isModalOpen, handleOk, handleCancel, messageApi, setLoad }) => {
+  ({ isModalOpen, handleOk, handleCancel, messageApi, setLoad, employee }) => {
     const [user, setUser] = useState();
     const createUser = () => {
       var param = {
-        empID: 0,
+        empID: user.empId,
         username: user.username,
         password: user.username,
       };
@@ -142,23 +143,13 @@ const UserCreation = React.memo(
             showSearch
             placeholder="Select a person"
             optionFilterProp="label"
-            value={user?.id}
-            onChange={(value) => setUser({ ...user, id: value })}
+            value={user?.empId}
+            onChange={(value) => setUser({ ...user, empId: value })}
             // onSearch={onSearch}
-            options={[
-              {
-                value: "1",
-                label: "Jack",
-              },
-              {
-                value: "2",
-                label: "Lucy",
-              },
-              {
-                value: "3",
-                label: "Tom",
-              },
-            ]}
+            options={employee.map((employee) => ({
+              value: employee.id,
+              label: employee.employee_name,
+            }))}
           />
           <Title level={5} className="mt-5">
             Username <span className="text-red-600">*</span>
@@ -256,6 +247,7 @@ const AllUser = () => {
   const [rows, setRows] = useState([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [employee, setEmployee] = useState([]);
   const [roleUser, setRoleUser] = useState();
   const [loading, setLoading] = useState(false);
   const [load, setLoad] = useState(false);
@@ -270,6 +262,13 @@ const AllUser = () => {
       }
     });
   }, [load]);
+  useEffect(() => {
+    EmployeeService.getEmployees((res) => {
+      if (res.status) {
+        setEmployee(res.data);
+      }
+    });
+  }, []);
 
   const showRoleModal = (id) => {
     setRoleUser(id);
@@ -394,6 +393,7 @@ const AllUser = () => {
         handleCancel={handleUserCancel}
         messageApi={messageApi}
         setLoad={setLoad}
+        employee={employee}
       />
       <RoleAssign
         isModalOpen={roleModalOpen}

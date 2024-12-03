@@ -68,16 +68,16 @@ const items = [
             label: "New Joinee",
             path: "/employee/add",
           },
-          {
-            key: "8",
-            label: "Previous Employees",
-            path: "/employee/previous",
-          },
+          // {
+          //   key: "8",
+          //   label: "Previous Employees",
+          //   path: "/employee/previous",
+          // },
         ],
       },
       {
         key: "g5",
-        label: "Deparment & Role",
+        label: "Deparment & Designation",
         type: "group",
         children: [
           {
@@ -87,14 +87,14 @@ const items = [
           },
           {
             key: "10",
-            label: "Employee Role",
-            path: "/employee/role",
+            label: "Designation List",
+            path: "/employee/designation",
           },
-          {
-            key: "11",
-            label: "Deparment View",
-            path: "/employee/deparment",
-          },
+          // {
+          //   key: "11",
+          //   label: "Deparment View",
+          //   path: "/employee/deparment",
+          // },
         ],
       },
     ],

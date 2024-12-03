@@ -19,6 +19,7 @@ const RoleCreation = ({ isModalOpen, handleOk, handleCancel, setLoad }) => {
   const createRole = () => {
     UserService.createRole({ role }, (res) => {
       if (res.status) {
+        setRole();
         setLoad((load) => !load);
         handleOk();
       } else {
