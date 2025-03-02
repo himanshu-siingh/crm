@@ -1,6 +1,7 @@
 import {
   Button,
   Checkbox,
+  Form,
   Input,
   Modal,
   Select,
@@ -16,92 +17,34 @@ import { UserAddOutlined } from "@ant-design/icons";
 import UserService from "../../services/request/user";
 import "./user.css";
 import EmployeeService from "../../services/request/employee";
-const dummyData = [
-  {
-    username: "user1",
-    empName: "Alice Johnson",
-    id: 1,
-    roles: [
-      {
-        id: 1,
-        role: "admin",
-      },
-      {
-        id: 2,
-        role: "manager",
-      },
-    ],
-  },
-  {
-    username: "user2",
-    empName: "Bob Smith",
-    id: 2,
-    roles: [
-      {
-        id: 3,
-        role: "editor",
-      },
-    ],
-  },
-  {
-    username: "user3",
-    empName: "Charlie Brown",
-    id: 3,
-    roles: [
-      {
-        id: 4,
-        role: "viewer",
-      },
-    ],
-  },
-  {
-    username: "user4",
-    empName: "Diana Prince",
-    id: 4,
-    roles: [
-      {
-        id: 5,
-        role: "admin",
-      },
-      {
-        id: 6,
-        role: "editor",
-      },
-    ],
-  },
-  {
-    username: "user5",
-    empName: "Ethan Hunt",
-    id: 5,
-    roles: [
-      {
-        id: 7,
-        role: "manager",
-      },
-      {
-        id: 8,
-        role: "viewer",
-      },
-    ],
-  },
-];
 
 const UserCreation = React.memo(
-  ({ isModalOpen, handleOk, handleCancel, messageApi, setLoad, employee }) => {
-    const [user, setUser] = useState();
-    const createUser = () => {
-      var param = {
-        empID: user.empId,
-        username: user.username,
-        password: user.username,
-      };
-      UserService.createUser(param, (res) => {
+  ({
+    isModalOpen,
+    handleOk,
+    handleCancel,
+    messageApi,
+    setLoad,
+    employee,
+    roles,
+  }) => {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const createUser = (values) => {
+      const email = employee.filter((x) => x.id == values.empID)[0]?.email;
+      //console.log(email);
+      //console.log({ ...values, email: email });
+      setLoading(true);
+      UserService.createUser({ ...values, email: email }, (res) => {
         var type, content;
         if (res.status) {
           type = "success";
           content = "User created successfully";
-          setUser();
+          form.resetFields();
           setLoad((x) => !x);
+          setLoading(false);
+          setIsAdmin(false);
           handleOk();
         } else {
           type = "error";
@@ -117,51 +60,67 @@ const UserCreation = React.memo(
       <Modal
         title="Create User"
         open={isModalOpen}
-        onOk={createUser}
         onCancel={handleCancel}
-        footer={[
-          <Button
-            key="back"
-            onClick={() => {
-              setUser();
-              handleCancel();
-            }}
-          >
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={createUser}>
-            Create
-          </Button>,
-        ]}
+        footer={null}
       >
         <p>Select employee to create user</p>
         <div className="py-5">
-          <Title level={5}>
-            Employee <span className="text-red-600">*</span>
-          </Title>
-          <Select
-            showSearch
-            placeholder="Select a person"
-            optionFilterProp="label"
-            value={user?.empId}
-            onChange={(value) => setUser({ ...user, empId: value })}
-            // onSearch={onSearch}
-            options={employee.map((employee) => ({
-              value: employee.id,
-              label: employee.employee_name,
-            }))}
-          />
-          <Title level={5} className="mt-5">
-            Username <span className="text-red-600">*</span>
-          </Title>
-          <Input
-            value={user?.username}
-            onChange={({ target }) =>
-              setUser({ ...user, username: target.value })
-            }
-            placeholder="Ex- himanshu.singh"
-            className="py-1"
-          />
+          <Form layout="vertical" form={form} onFinish={createUser}>
+            <Form.Item
+              label="Employee ID"
+              name="empID"
+              rules={[{ required: true, message: "Please select an employee" }]}
+            >
+              <Select
+                showSearch
+                placeholder="Select an Employee"
+                optionFilterProp="label"
+                options={employee.map((employee) => ({
+                  value: employee.id,
+                  label: employee.employee_name,
+                }))}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Username"
+              name="username"
+              rules={[{ required: true, message: "Please fill the username" }]}
+            >
+              <Input placeholder="Ex- himanshu.singh" />
+            </Form.Item>
+            <Form.Item label="Is Admin" name="isAdmin" valuePropName="checked">
+              <Checkbox
+                value={isAdmin}
+                onChange={(e) => setIsAdmin(e.target.checked)}
+                placeholder="Is Admin"
+              >
+                is Admin
+              </Checkbox>
+            </Form.Item>
+            {!isAdmin && (
+              <Form.Item
+                label="Role"
+                name="role"
+                rules={[{ required: true, message: "Please select a role" }]}
+              >
+                <Select
+                  showSearch
+                  placeholder="Select an Employee"
+                  optionFilterProp="label"
+                  options={roles.map((role) => ({
+                    value: role.id,
+                    label: role.role,
+                  }))}
+                />
+              </Form.Item>
+            )}
+
+            <Form.Item>
+              <Button loading={loading} type="primary" htmlType="submit">
+                Create User
+              </Button>
+            </Form.Item>
+          </Form>
         </div>
       </Modal>
     );
@@ -171,6 +130,7 @@ const UserCreation = React.memo(
 const RoleAssign = React.memo(
   ({ isModalOpen, handleOk, handleCancel, roleUser, messageApi, setLoad }) => {
     const [roles, setRoles] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [checkedList, setCheckedList] = useState([1]);
 
     useEffect(() => {
@@ -185,14 +145,17 @@ const RoleAssign = React.memo(
           );
           setCheckedList(check);
         } else {
+          message.error(res.message);
         }
       });
     }, [roleUser]);
 
     const assignRole = () => {
+      setLoading(true);
       UserService.assignRole(
         { userId: roleUser, roleIds: checkedList },
         (res) => {
+          setLoading(false);
           var type, content;
           if (res.status) {
             type = "success";
@@ -221,7 +184,12 @@ const RoleAssign = React.memo(
           <Button key="back" onClick={handleCancel}>
             Return
           </Button>,
-          <Button key="submit" type="primary" onClick={assignRole}>
+          <Button
+            loading={loading}
+            key="submit"
+            type="primary"
+            onClick={assignRole}
+          >
             Submit
           </Button>,
         ]}
@@ -243,14 +211,16 @@ const RoleAssign = React.memo(
   }
 );
 
-const AllUser = () => {
+const Users = () => {
   const [rows, setRows] = useState([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [employee, setEmployee] = useState([]);
+  const [allRoles, setAllRoles] = useState([]);
   const [roleUser, setRoleUser] = useState();
   const [loading, setLoading] = useState(false);
   const [load, setLoad] = useState(false);
+  const [query, setQuery] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
@@ -266,6 +236,18 @@ const AllUser = () => {
     EmployeeService.getEmployees((res) => {
       if (res.status) {
         setEmployee(res.data);
+      } else {
+        message.error(res.message);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    UserService.getAllRoles((res) => {
+      if (res.status) {
+        //console.log(res.data);
+        setAllRoles(res.data);
+      } else {
+        message.error(res.message);
       }
     });
   }, []);
@@ -296,6 +278,7 @@ const AllUser = () => {
       title: "S.no",
       dataIndex: "id",
       rowScope: "row",
+      render: (d, r, i) => i + 1,
     },
     {
       title: "Username",
@@ -307,49 +290,49 @@ const AllUser = () => {
       title: "Employee Name",
       dataIndex: "empName",
       key: "empName",
-      sorter: (a, b) => a.empName - b.empName,
     },
     {
       title: "Roles",
       key: "roles",
       dataIndex: "roles",
-      render: (_, { roles }) => {
-        return roles.map((role) => {
-          return <Tag>{role.name?.toUpperCase()}</Tag>;
-        });
+      render: (_, { roles, isAdmin }) => {
+        return isAdmin ? (
+          <Tag>Administrator</Tag>
+        ) : (
+          roles.map((role) => {
+            return <Tag>{role.name?.toUpperCase()}</Tag>;
+          })
+        );
       },
     },
     {
       title: "Action",
       key: "id",
       dataIndex: "id",
-      render: (_, { id }) => {
+      render: (_, { id, isAdmin }) => {
         return (
-          <Space>
-            <Button
-              type="fn"
-              className="text-blue-400 hover:text-blue-700"
-              onClick={() => {
-                UserService.changeStatus({ status: 2, userId: id }, (res) => {
-                  if (res.status) {
-                    message.success("User Deactivated");
-                    setLoad((x) => !x);
-                  } else {
-                    message.error("Failed to deactivate user");
-                  }
-                });
-              }}
-            >
-              Deactivate
-            </Button>
-            <Button
-              type="fn"
-              onClick={() => showRoleModal(id)}
-              className="text-blue-400 hover:text-blue-700"
-            >
-              Assign Role
-            </Button>
-          </Space>
+          !isAdmin && (
+            <Space>
+              <Button
+                type="link"
+                onClick={() => {
+                  UserService.changeStatus({ status: 2, userId: id }, (res) => {
+                    if (res.status) {
+                      message.success("User Deactivated");
+                      setLoad((x) => !x);
+                    } else {
+                      message.error("Failed to deactivate user");
+                    }
+                  });
+                }}
+              >
+                Deactivate
+              </Button>
+              <Button type="link" onClick={() => showRoleModal(id)}>
+                Assign Role
+              </Button>
+            </Space>
+          )
         );
       },
     },
@@ -357,24 +340,34 @@ const AllUser = () => {
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex justify-between flex-wrap">
         <div>
           <Title level={4} style={{ margin: 0 }}>
             Users
           </Title>
           <Text type="secondary">View all employees user account here</Text>
         </div>
-        <div>
+        <Space className="flex flex-wrap-reverse">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Enter Username or employee Name to search"
+            className="sm:w-[280px]"
+          />
           <Button color="primary" variant="outlined" onClick={showUserModal}>
             <UserAddOutlined /> Create User
           </Button>
-        </div>
+        </Space>
       </div>
-      <div style={{ overflowX: "auto", maxWidth: "88vw" }}>
+      <div style={{ overflowX: "auto" }} className="max-w-[calc(100vw-40px)]">
         <Table
           className="mt-5"
           columns={columns}
-          dataSource={rows}
+          dataSource={rows.filter(
+            (row) =>
+              row.username.toLowerCase().includes(query.toLowerCase().trim()) ||
+              row.empName.toLowerCase().includes(query.toLowerCase().trim())
+          )}
           pagination={{
             // pageSize: 5,
             defaultPageSize: 10,
@@ -394,6 +387,7 @@ const AllUser = () => {
         messageApi={messageApi}
         setLoad={setLoad}
         employee={employee}
+        roles={allRoles}
       />
       <RoleAssign
         isModalOpen={roleModalOpen}
@@ -407,4 +401,4 @@ const AllUser = () => {
   );
 };
 
-export default AllUser;
+export default Users;

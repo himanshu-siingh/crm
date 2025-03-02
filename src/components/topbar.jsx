@@ -7,10 +7,12 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import Search from "antd/es/input/Search";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 const { Text } = Typography;
 const items = [
   {
-    key: "1",
+    key: "account",
     label: "My Account",
     disabled: true,
   },
@@ -18,23 +20,46 @@ const items = [
     type: "divider",
   },
   {
-    key: "2",
-    label: <a href="../user/profile">Profile</a>,
+    key: "profile",
+    label: "Profile",
     icon: <UserOutlined />,
   },
   {
-    key: "4",
+    key: "setting",
     label: "Settings",
     icon: <SettingOutlined />,
     extra: "⌘S",
   },
   {
-    key: "3",
+    key: "logout",
     label: "Logout",
     icon: <LogoutOutlined />,
   },
 ];
 const Topbar = ({ setOpenSidebar }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const handleClick = (e) => {
+    switch (e.key) {
+      case "logout":
+        logout();
+        break;
+      case "profile":
+        navigate("/employee/profile", {
+          state: {
+            id: user.empId,
+          },
+        });
+        break;
+      case "setting":
+        break;
+      case "account":
+        break;
+
+      default:
+        break;
+    }
+  };
   return (
     <>
       <div className="flex justify-between px-5 py-3">
@@ -57,13 +82,14 @@ const Topbar = ({ setOpenSidebar }) => {
           />
         </div>
         <Space>
-          <Text type="secondary">Welcome, Himanshu</Text>
+          <Text type="secondary">Welcome, {user?.name}</Text>
           <Dropdown
             menu={{
               items,
+              onClick: handleClick,
             }}
           >
-            <Avatar size={40} icon={<UserOutlined />} />
+            <Avatar size={40} src={user?.profile} />
           </Dropdown>
         </Space>
       </div>

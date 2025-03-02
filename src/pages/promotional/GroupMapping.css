@@ -1,0 +1,11 @@
+.custom-transfer .ant-transfer-list {
+    flex: 1; /* Make both lists flexible and take up available space */
+    min-width: 0; /* Prevent them from shrinking to fit content */
+    width: 50%; /* Ensure equal distribution of space between lists */
+  }
+  
+  .custom-transfer .ant-transfer {
+    display: flex; /* Ensure the main container behaves as a flex container */
+    width: 100%; /* Full width for the Transfer component */
+  }
+  

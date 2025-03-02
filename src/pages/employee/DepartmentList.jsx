@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Button, Table, Modal, Input, message } from "antd";
+import {
+  Typography,
+  Button,
+  Table,
+  Modal,
+  Input,
+  message,
+  Popconfirm,
+} from "antd";
 import EmployeeService from "../../services/request/employee";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 const { Title, Text } = Typography;
-
-const sample = [{ id: 1, name: "Development", totalEmployee: 180 }];
 
 const AddDepartment = ({ isModalOpen, handleCancel, handleOk, setLoad }) => {
   const [depart, setDepart] = useState();
@@ -56,9 +63,11 @@ const AddDepartment = ({ isModalOpen, handleCancel, handleOk, setLoad }) => {
 };
 
 const DepartmentList = () => {
-  const [rows, setRows] = useState(sample);
+  const { hasPermission } = useAuth();
+  const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [load, setLoad] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const closeModal = () => {
@@ -76,22 +85,24 @@ const DepartmentList = () => {
       dataIndex: "name",
       key: "name",
       render: (text, record) => (
-        <Button
-          type="fgg"
-          className=" hover:text-blue-700"
-          onClick={() => {
-            navigate("/employee/department", {
-              state: {
-                data: {
-                  department_id: record.id,
-                  department_name: record.name,
+        <>
+          <Button
+            type="link"
+            className=" text-black hover:text-blue-700"
+            onClick={() => {
+              navigate("/employee/department", {
+                state: {
+                  data: {
+                    department_id: record.id,
+                    department_name: record.name,
+                  },
                 },
-              },
-            });
-          }}
-        >
-          {text}
-        </Button>
+              });
+            }}
+          >
+            {text}
+          </Button>
+        </>
       ),
     },
     {
@@ -100,35 +111,47 @@ const DepartmentList = () => {
       key: "totalEmployee",
     },
     {
-      title: "",
+      title: "Action",
       dataIndex: "id",
       key: "id",
-      render: (id, row) => (
-        <Button
-          type="fgg"
-          className="text-blue-400 hover:text-blue-700"
-          onClick={() => {
-            EmployeeService.deleteDepartment({ id }, (res) => {
-              if (res.status) {
-                setLoad((x) => !x);
-                message.success("Department Deleted Successfully");
-              } else {
-                message.error("Error");
-              }
-            });
-          }}
-        >
-          Delete
-        </Button>
+      render: (id) => (
+        <>
+          {hasPermission("delete:department") && (
+            <Popconfirm
+              title="Delete the Department"
+              description="Are you sure to delete this department?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => {
+                EmployeeService.deleteDepartment({ id }, (res) => {
+                  if (res.status) {
+                    setLoad((x) => !x);
+                    message.success("Department Deleted Successfully");
+                  } else {
+                    message.error(res.message);
+                  }
+                });
+              }}
+            >
+              <Text className="text-blue-400 hover:text-blue-700 cursor-pointer">
+                Delete
+              </Text>
+            </Popconfirm>
+          )}
+        </>
       ),
     },
   ];
 
   useEffect(() => {
+    setLoading(true);
     EmployeeService.getDepartment((res) => {
       if (res.status) {
         setRows(res.data);
+      } else {
+        message.error(res.message);
       }
+      setLoading(false);
     });
   }, [load]);
   return (
@@ -141,16 +164,21 @@ const DepartmentList = () => {
           <Text type="secondary">View all available departments</Text>
         </div>
         <div>
-          <Button
-            color="primary"
-            variant="outlined"
-            onClick={() => setOpen(true)}
-          >
-            + Add Department
-          </Button>
+          {hasPermission("add:department") && (
+            <Button
+              color="primary"
+              variant="outlined"
+              onClick={() => setOpen(true)}
+            >
+              + Add Department
+            </Button>
+          )}
         </div>
       </div>
-      <div style={{ overflowX: "auto", maxWidth: "88vw" }}>
+      <div
+        style={{ overflowX: "auto" }}
+        className="lg:max-w-[calc(100vw-290px)] max-w-[calc(100vw-40px)]"
+      >
         <Table
           className="mt-5"
           columns={columns}
@@ -158,11 +186,11 @@ const DepartmentList = () => {
           pagination={{
             defaultPageSize: 10,
             pageSizeOptions: [10, 25, 50],
-            showTotal: (total) => `Total ${total} users`,
+            showTotal: (total) => `Total ${total} Department`,
             showQuickJumper: true,
             showSizeChanger: true,
           }}
-          //   loading={loading}
+          loading={loading}
         />
       </div>
       <AddDepartment

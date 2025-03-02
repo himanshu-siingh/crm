@@ -2,15 +2,16 @@ import { Button, Table, Typography } from "antd";
 
 import React, { useEffect, useState } from "react";
 import EmployeeService from "../../services/request/employee";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 const { Title, Text } = Typography;
 
 const EmployeeByDepart = () => {
   const [rows, setRows] = useState([]);
   const location = useLocation();
+  const navigate = useNavigate();
   const { data } = location.state || {};
   useEffect(() => {
-    console.log(data);
+    //console.log(data);
     EmployeeService.getEmployeeByDepart(
       {
         departmentId: data.department_id,
@@ -19,6 +20,8 @@ const EmployeeByDepart = () => {
       (res) => {
         if (res.status) {
           setRows(res.data);
+        } else {
+          message.error(res.message);
         }
       }
     );
@@ -33,6 +36,23 @@ const EmployeeByDepart = () => {
       title: "Employee Name",
       dataIndex: "employee_name",
       key: "employee_name",
+      render: (text, row) => {
+        return (
+          <Button
+            type="link"
+            className="text-black"
+            onClick={() =>
+              navigate(`/employee/profile`, {
+                state: {
+                  id: row.id,
+                },
+              })
+            }
+          >
+            {text}
+          </Button>
+        );
+      },
     },
     {
       title: "Email",

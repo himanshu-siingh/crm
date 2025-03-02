@@ -1,8 +1,10 @@
 import {
   Button,
+  Form,
   Input,
   message,
   Modal,
+  Popconfirm,
   Space,
   Table,
   Tag,
@@ -13,33 +15,19 @@ import React, { useEffect, useState } from "react";
 import { UserAddOutlined } from "@ant-design/icons";
 import UserService from "../../services/request/user";
 
-const dummyData = [
-  { id: 1, pageID: 1901, permission: "Ticket Management" },
-  { id: 2, pageID: 1902, permission: "Customer Interaction" },
-  { id: 3, pageID: 1903, permission: "Problem Resolution" },
-  { id: 4, pageID: 1904, permission: "Feedback Collection" },
-  { id: 5, pageID: 1905, permission: "Knowledge Base Management" },
-  { id: 6, pageID: 1906, permission: "Escalation Management" },
-  { id: 7, pageID: 1907, permission: "Service Level Management" },
-  { id: 8, pageID: 1908, permission: "Report Generation" },
-  { id: 9, pageID: 1909, permission: "User Training" },
-  { id: 10, pageID: 1910, permission: "Collaboration with Teams" },
-];
-
 const PermissionCreation = ({
   isModalOpen,
   handleOk,
   handleCancel,
   setLoad,
 }) => {
-  const [data, setData] = useState();
-
-  const addPermission = () => {
-    console.log(data);
-    UserService.createPermission(data, (res) => {
+  const [form] = Form.useForm();
+  const addPermission = (values) => {
+    UserService.createPermission(values, (res) => {
       if (res.status) {
         message.success("Permission added Succesfully");
         setLoad((x) => !x);
+        form.resetFields();
         handleOk();
       } else {
         message.error(res.message);
@@ -47,52 +35,52 @@ const PermissionCreation = ({
     });
   };
 
+  const handleClose = () => {
+    form.resetFields();
+    handleOk();
+  };
+
   return (
     <Modal
       title="Create Permission"
       open={isModalOpen}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      footer={[
-        <Button key="back" onClick={handleCancel}>
-          Return
-        </Button>,
-        <Button key="submit" type="primary" onClick={addPermission}>
-          Submit
-        </Button>,
-      ]}
+      onOk={handleClose}
+      onCancel={handleClose}
+      footer={[]}
     >
       <p>Add new Permission here </p>
       <div className="py-5">
-        <Title level={5}>
-          Page ID <span className="text-red-600">*</span>
-        </Title>
-        <Input
-          value={data?.pageId}
-          onChange={({ target }) => setData({ ...data, pageId: target.value })}
-          placeholder="Ex- 1132"
-          className="py-1"
-        />
-        <Title level={5} className="mt-5">
-          Permission <span className="text-red-600">*</span>
-        </Title>
-        <Input
-          value={data?.permission}
-          onChange={({ target }) =>
-            setData({ ...data, permission: target.value })
-          }
-          placeholder="Ex - User List"
-          className="py-1"
-        />
+        <Form layout="vertical" form={form} onFinish={addPermission}>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Permission name is required" }]}
+          >
+            <Input placeholder="Ex- Add Employee" className="py-1" />
+          </Form.Item>
+          <Form.Item
+            label="Permission"
+            name="permission"
+            rules={[{ required: true, message: "Permission is required" }]}
+          >
+            <Input placeholder="Ex- add:employee" className="py-1" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Create Permission
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </Modal>
   );
 };
 
 const Permission = () => {
-  const [rows, setRows] = useState(dummyData);
+  const [rows, setRows] = useState([]);
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
   const [load, setLoad] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const showPermissionModal = (id) => {
     setPermissionModalOpen(true);
@@ -104,10 +92,13 @@ const Permission = () => {
     setPermissionModalOpen(false);
   };
   useEffect(() => {
+    setLoading(true);
     UserService.getAllPermission((res) => {
+      setLoading(false);
       if (res.status) {
         setRows(res.data);
-        console.log(res.data);
+      } else {
+        message.error(res.message);
       }
     });
   }, [load]);
@@ -116,11 +107,12 @@ const Permission = () => {
       title: "S.no",
       dataIndex: "id",
       rowScope: "row",
+      render: (d, r, i) => i + 1,
     },
     {
-      title: "Page Id",
-      dataIndex: "pageId",
-      key: "pageId",
+      title: "Permission Name",
+      dataIndex: "permission_name",
+      key: "permission_name",
     },
     {
       title: "Permission",
@@ -134,9 +126,10 @@ const Permission = () => {
       render: (_, { id }) => {
         return (
           <Space>
-            <Button
-              type="fn"
-              onClick={() => {
+            <Popconfirm
+              title="Delete the permission"
+              description="Are you sure to delete this permission?"
+              onConfirm={() => {
                 UserService.deletePermission({ id }, (res) => {
                   if (res.status) {
                     message.success("Permission deleted Succesfully");
@@ -146,10 +139,13 @@ const Permission = () => {
                   }
                 });
               }}
-              className="text-blue-400 hover:text-blue-700"
+              okText="Yes"
+              cancelText="No"
             >
-              Delete
-            </Button>
+              <Text className="text-blue-400 hover:text-blue-700 cursor-pointer">
+                Delete
+              </Text>
+            </Popconfirm>
           </Space>
         );
       },
@@ -175,11 +171,11 @@ const Permission = () => {
           </Button>
         </div>
       </div>
-      <div style={{ overflowX: "auto", maxWidth: "88vw" }}>
+      <div style={{ overflowX: "auto" }} className="max-w-[calc(100vw-40px)]">
         <Table
           className="mt-5"
           columns={columns}
-          dataSource={rows}
+          dataSource={rows.map((row) => ({ ...row, key: row.id }))}
           pagination={{
             // pageSize: 5,
             defaultPageSize: 5,
@@ -188,6 +184,7 @@ const Permission = () => {
             showQuickJumper: true,
             showSizeChanger: true,
           }}
+          loading={loading}
         />
       </div>
       <PermissionCreation

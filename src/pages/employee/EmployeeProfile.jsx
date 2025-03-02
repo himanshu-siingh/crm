@@ -1,147 +1,142 @@
-import React from "react";
-import { Card, Descriptions, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Card, Tag, Tabs, message } from "antd";
+import FileUploader from "../../components/FileUploader";
+import BankDetails from "../../components/profile/BankDetails";
+import AddressDetails from "../../components/profile/AddressDetails";
+import ChangePassword from "../../components/profile/ChangePassword";
+import { useLocation, useNavigate } from "react-router-dom";
+import EmployeeService from "../../services/request/employee";
+import DisplayRow from "../../components/profile/DisplayRow";
+import { useAuth } from "../../context/AuthContext";
+import SessionService from "../../services/SessionService";
 
-const EmployeeProfile = () => {
-  const employeeData = {
-    employeeId: "EMP001",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    mobile: "9876543210",
-    designation: "Software Engineer",
-    department: "Development",
-    dob: "1990-06-15",
-    doj: "2022-01-10",
-    fatherName: "Michael Doe",
-    motherName: "Sarah Doe",
-    aadharNumber: "1234-5678-9012",
-    panNumber: "ABCDE1234F",
-    bankName: "XYZ Bank",
-    accountNumber: "123456789012",
-    ifscCode: "XYZB0001234",
-    address: {
-      street: "123 Main Street",
-      city: "New York",
-      state: "NY",
-      postalCode: "10001",
+const EmployeeProfilePage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const data = location.state || [];
+  const { user } = useAuth();
+  const [employee, setEmployee] = useState({});
+  useEffect(() => {
+    if (data.id) {
+      EmployeeService.getEmployeeProfile({ id: data?.id }, (res) => {
+        if (res.status) {
+          setEmployee(res.data);
+        } else {
+          message.error(res.message);
+        }
+      });
+    } else {
+      navigate("/");
+    }
+  }, [data]);
+
+  const TabData = [
+    {
+      label: "Bank Details",
+      key: "bank",
+      children: (
+        <BankDetails
+          initialBankDetails={{
+            id: data?.id,
+            bankName: employee.bank_name,
+            accountNumber: employee.account_number,
+            ifscCode: employee.ifsc,
+            accountHolder: employee.employee_name,
+          }}
+        />
+      ),
     },
+    {
+      label: "Address ",
+      key: "address",
+      children: (
+        <AddressDetails
+          initialBankDetails={{
+            id: data?.id,
+            address1: employee.address1,
+            address2: employee.address2,
+            landmark: employee.landmark,
+            post_office: employee.post_office,
+            city: employee.city,
+            state: employee.state,
+            country: employee.country,
+            zip: employee.pincode,
+          }}
+        />
+      ),
+    },
+    {
+      label: "Change Password",
+      key: "change_password",
+      children: <ChangePassword />,
+    },
+  ];
+  const onUpload = (file) => {
+    const formdata = new FormData();
+    formdata.append("profile", file);
+    formdata.append("id", data?.id);
+    formdata.append("name", employee.employee_name);
+    EmployeeService.updateProfilePicture(formdata, (res) => {
+      if (res.status) {
+        //console.log(res.data);
+        message.success("Profile Picture updated succesfully");
+        SessionService.set.userProfile(res.data?.url);
+      } else {
+        //console.log(res);
+        message.error(res.message);
+      }
+    });
   };
-
-  const handleEdit = (section) => {
-    console.log(`Edit ${section} clicked!`);
-    // Add logic to open a modal or navigate to an edit page
-  };
-
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-          Employee Profile
-        </h2>
+    <div className="">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Header Section */}
+        <div className="grid grid-cols-1">
+          <Card className="grid-cols-1  mb-4 shadow-lg">
+            <div className="flex flex-col items-center justify-center">
+              <FileUploader url={employee.profile} onUpload={onUpload} />
+              <div className="md:ml-6 mt-4 text-center">
+                <h1 className="text-2xl font-semibold">
+                  {employee.employee_name}
+                </h1>
+                <p className="text-gray-500">
+                  {employee.designation} ({employee.department})
+                </p>
+                <p className="text-gray-400">{employee.city}</p>
+              </div>
+            </div>
+          </Card>
+          {/* Personal Bio */}
+          <Card title="Personal Details" className="md:col-span-2  shadow-lg">
+            <DisplayRow title="Employee Id" value={employee.employeeId} />
+            <DisplayRow title="Father Name" value={employee.father_name} />
+            <DisplayRow title="Mother Name" value={employee.mother_name} />
+            <DisplayRow title="Mobile" value={employee.mobile} />
+            <DisplayRow title="Email" value={employee.email} />
+            <DisplayRow
+              title="Skills"
+              value={employee?.skills?.map((skill, index) => (
+                <Tag key={index} color="blue">
+                  {skill}
+                </Tag>
+              ))}
+            />
+          </Card>
+        </div>
 
-        {/* Personal Details */}
-        <Card
-          title="Personal Details"
-          extra={
-            <Button
-              type="primary"
-              onClick={() => handleEdit("Personal Details")}
-            >
-              Edit
-            </Button>
-          }
-          className="mb-6"
-        >
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="Employee ID">
-              {employeeData.employeeId}
-            </Descriptions.Item>
-            <Descriptions.Item label="Name">
-              {employeeData.name}
-            </Descriptions.Item>
-            <Descriptions.Item label="Email">
-              {employeeData.email}
-            </Descriptions.Item>
-            <Descriptions.Item label="Mobile">
-              {employeeData.mobile}
-            </Descriptions.Item>
-            <Descriptions.Item label="Designation">
-              {employeeData.designation}
-            </Descriptions.Item>
-            <Descriptions.Item label="Department">
-              {employeeData.department}
-            </Descriptions.Item>
-            <Descriptions.Item label="Date of Birth">
-              {employeeData.dob}
-            </Descriptions.Item>
-            <Descriptions.Item label="Date of Joining">
-              {employeeData.doj}
-            </Descriptions.Item>
-            <Descriptions.Item label="Father's Name">
-              {employeeData.fatherName}
-            </Descriptions.Item>
-            <Descriptions.Item label="Mother's Name">
-              {employeeData.motherName}
-            </Descriptions.Item>
-            <Descriptions.Item label="Aadhar Number">
-              {employeeData.aadharNumber}
-            </Descriptions.Item>
-            <Descriptions.Item label="PAN Number">
-              {employeeData.panNumber}
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        {/* Bank Details */}
-        <Card
-          title="Bank Details"
-          extra={
-            <Button type="primary" onClick={() => handleEdit("Bank Details")}>
-              Edit
-            </Button>
-          }
-          className="mb-6"
-        >
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="Bank Name">
-              {employeeData.bankName}
-            </Descriptions.Item>
-            <Descriptions.Item label="Account Number">
-              {employeeData.accountNumber}
-            </Descriptions.Item>
-            <Descriptions.Item label="IFSC Code">
-              {employeeData.ifscCode}
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        {/* Address */}
-        <Card
-          title="Address"
-          extra={
-            <Button type="primary" onClick={() => handleEdit("Address")}>
-              Edit
-            </Button>
-          }
-          className="mb-6"
-        >
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="Street">
-              {employeeData.address.street}
-            </Descriptions.Item>
-            <Descriptions.Item label="City">
-              {employeeData.address.city}
-            </Descriptions.Item>
-            <Descriptions.Item label="State">
-              {employeeData.address.state}
-            </Descriptions.Item>
-            <Descriptions.Item label="Postal Code">
-              {employeeData.address.postalCode}
-            </Descriptions.Item>
-          </Descriptions>
+        {/* Main Content Section */}
+        <Card className="lg:col-span-2 shadow-lg">
+          <Tabs
+            tabPosition={"top"}
+            items={TabData.filter((x) =>
+              x.key != "change_password" ? true : user.empId == data.id
+            )}
+            className="m-0"
+          />
         </Card>
       </div>
     </div>
   );
 };
 
-export default EmployeeProfile;
+export default EmployeeProfilePage;

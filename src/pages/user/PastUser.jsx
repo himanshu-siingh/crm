@@ -27,6 +27,8 @@ const PastUser = () => {
       setLoading(false);
       if (res.status) {
         setRows(res.data);
+      } else {
+        message.error(res.message);
       }
     });
   }, [load]);
@@ -36,6 +38,7 @@ const PastUser = () => {
       title: "S.no",
       dataIndex: "id",
       rowScope: "row",
+      key: "sno",
     },
     {
       title: "Username",
@@ -67,7 +70,7 @@ const PastUser = () => {
         return (
           <Space>
             <Button
-              type="fn"
+              type="link"
               className="text-blue-400 hover:text-blue-700"
               onClick={() => {
                 UserService.changeStatus({ status: 1, userId: id }, (res) => {
@@ -100,11 +103,16 @@ const PastUser = () => {
           </Text>
         </div>
       </div>
-      <div style={{ overflowX: "auto", maxWidth: "88vw" }}>
+      <div
+        style={{ overflowX: "auto" }}
+        className="lg:max-w-[calc(100vw-290px)] max-w-[calc(100vw-40px)]"
+      >
         <Table
           className="mt-5"
           columns={columns}
-          dataSource={rows}
+          dataSource={rows.map((row) => {
+            return { ...row, key: row.id };
+          })}
           pagination={{
             // pageSize: 5,
             defaultPageSize: 10,

@@ -1,10 +1,12 @@
 import { Menu } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { HomeOutlined } from "@ant-design/icons";
 import logo from "../images/logo.png";
+import { useAuth } from "../context/AuthContext";
+import { useEffect, useState } from "react";
 const items = [
   {
-    key: "5",
+    key: "dashboard",
     label: "Dashboard",
     path: "/",
     icon: <HomeOutlined />,
@@ -19,14 +21,16 @@ const items = [
         type: "group",
         children: [
           {
-            key: "1",
+            key: "allUser",
             label: "View All User",
-            path: "/users",
+            path: "/user",
+            rwp: ["admin"],
           },
           {
-            key: "2",
+            key: "pastUser",
             label: "Past Users",
             path: "/user/past",
+            rwp: ["admin"],
           },
         ],
       },
@@ -36,14 +40,16 @@ const items = [
         type: "group",
         children: [
           {
-            key: "3",
+            key: "roles",
             label: "Roles",
             path: "/user/role",
+            rwp: ["admin"],
           },
           {
-            key: "4",
+            key: "permission",
             label: "Permission",
             path: "/user/permission",
+            rwp: ["admin"],
           },
         ],
       },
@@ -59,20 +65,17 @@ const items = [
         type: "group",
         children: [
           {
-            key: "6",
+            key: "employees",
             label: "Employee List",
             path: "/employee",
+            rwp: "view:employees",
           },
           {
-            key: "7",
+            key: "newJoinee",
             label: "New Joinee",
             path: "/employee/add",
+            rwp: "add:employee",
           },
-          // {
-          //   key: "8",
-          //   label: "Previous Employees",
-          //   path: "/employee/previous",
-          // },
         ],
       },
       {
@@ -81,20 +84,17 @@ const items = [
         type: "group",
         children: [
           {
-            key: "9",
+            key: "department",
             label: "Department List",
             path: "/department",
+            rwp: "view:department",
           },
           {
-            key: "10",
+            key: "designation",
             label: "Designation List",
             path: "/employee/designation",
+            rwp: "view:designation",
           },
-          // {
-          //   key: "11",
-          //   label: "Deparment View",
-          //   path: "/employee/deparment",
-          // },
         ],
       },
     ],
@@ -105,139 +105,195 @@ const items = [
     children: [
       {
         key: "g6",
-        label: "Leads",
+        label: "Lead",
         type: "group",
         //There is page for lead view
         children: [
+          // {
+          //   key: "12",
+          //   label: "Generate Lead",
+          //   path: "/lead/add",
+          // },
           {
-            key: "12",
-            label: "Generate Lead",
-            path: "/lead/add",
-          },
-          {
-            key: "13",
+            key: "leads",
             label: "Leads List",
-            path: "/leads",
+            path: "/lead",
+            rwp: "view:leads",
           },
           {
-            key: "14",
-            label: "My Leads",
-            path: "/lead/user",
+            key: "myMeetings",
+            label: "My Meetings",
+            path: "/lead/meeting",
+            rwp: "view:lead:meeting",
+          },
+          {
+            key: "completedMeeting",
+            label: "Completed Meetings",
+            path: "/lead/meeting/completed",
+            rwp: "view:lead:meeting",
           },
         ],
       },
     ],
   },
   {
-    key: "sub4",
-    label: "Project Management",
+    key: "promotional",
+    label: "Promotional",
     children: [
       {
-        key: "g7",
-        label: "Project",
+        key: "group",
+        label: "Grouping",
         type: "group",
-        //There is page for lead view
         children: [
           {
-            key: "15",
-            label: "My Project",
-            path: "/project",
+            key: "addGroup",
+            label: "User Groups",
+            path: "/groups",
+            rwp: "view:group",
           },
           {
-            key: "16",
-            label: "Projects List",
-            path: "/projects",
-          },
-          {
-            key: "17",
-            label: "Add Project",
-            path: "/project/add",
+            key: "mapUser",
+            label: "Map Users to Groups",
+            path: "/groups/map",
+            rwp: "map:group",
           },
         ],
       },
-    ],
-  },
-  {
-    key: "sub5",
-    label: "Mail Management",
-    children: [
       {
-        key: "g8",
+        key: "mail",
         label: "Mail",
         type: "group",
-        //There is page for lead view
         children: [
           {
-            key: "18",
+            key: "compose",
             label: "Compose",
             path: "/mail/compose",
+            rwp: "compose:mail",
           },
           {
-            key: "19",
-            label: "Sent Mail",
+            key: "draft",
+            label: "Draft",
+            path: "/mail/draft",
+            rwp: "view:draft",
+          },
+          {
+            key: "sent",
+            label: "Sent",
             path: "/mail/sent",
+            rwp: "view:sent",
           },
         ],
       },
       {
-        key: "g9",
+        key: "template",
         label: "Templates",
         type: "group",
-        //There is page for lead view
         children: [
           {
-            key: "20",
+            key: "addtemplate",
             label: "Create Template",
             path: "/template/create",
+            rwp: "create:template",
           },
           {
-            key: "21",
+            key: "alltemplate",
             label: "List Templates",
-            path: "/mail/sent",
-          },
-        ],
-      },
-      {
-        key: "g10",
-        label: "Mail Groups",
-        type: "group",
-        //There is page for lead view
-        children: [
-          {
-            key: "22",
-            label: "Create Mail Groups",
-            path: "/mail/group",
+            path: "/template",
+            rwp: "view:draft",
           },
         ],
       },
     ],
   },
   {
-    key: "23",
-    label: "Contacts",
-    path: "/contacts",
+    key: "Finance",
+    label: "Accounts Management",
+    children: [
+      {
+        key: "payment",
+        label: "Payment",
+        type: "group",
+        children: [
+          {
+            key: "addpayment",
+            label: "Create Payment",
+            path: "/payment/create",
+            rwp: "create:payment",
+          },
+          {
+            key: "allpayment",
+            label: "List Payments",
+            path: "/payment",
+            rwp: "view:payment",
+          },
+        ],
+      },
+      {
+        key: "invoices",
+        label: "Invoices",
+        type: "group",
+        children: [
+          {
+            key: "addinvoice",
+            label: "Create Incoice",
+            path: "/invoice/create",
+            rwp: "create:invoice",
+          },
+          {
+            key: "allinvoices",
+            label: "List Invoices",
+            path: "/invoice",
+            rwp: "view:invoice",
+          },
+        ],
+      },
+    ],
   },
 ];
 
-const Sidebar = ({ openSidebar, setOpenSidebar, drawer }) => {
+const Sidebar = ({ setOpenSidebar, drawer }) => {
   const navigate = useNavigate();
-  function generatePaths(arr, patharr) {
-    patharr = {};
-    arr.map((nav) => {
-      if (nav.children) {
-        var np = generatePaths(nav.children, patharr);
-        patharr = { ...patharr, ...np };
-      } else {
-        patharr[nav.key] = nav.path;
-      }
-    });
-    return patharr;
-  }
-  const routes = generatePaths(items, []);
+  const location = useLocation();
+  const [navs, setNavs] = useState({});
+  const { hasPermission, user } = useAuth();
+  var routes = {};
+  const getNavs = (items) => {
+    return items
+      .map((item) => {
+        if (item.children) {
+          return { ...item, children: getNavs(item.children) };
+        } else if (!item.rwp || hasPermission(item.rwp)) {
+          routes[item.key] = item.path;
+          return item;
+        }
+      })
+      .filter((item) => {
+        if (!item) {
+          return false;
+        } else if (item.children && item.children.length <= 0) {
+          return false;
+        }
+        return true;
+      });
+  };
+  var navigation;
+  useEffect(() => {
+    navigation = getNavs(items);
+    setNavs({ navigation, routes });
+  }, [user]);
   const route = ({ key }) => {
     if (drawer) setOpenSidebar((open) => !open);
-    navigate(routes[key]);
+    navigate(navs?.routes[key]);
   };
+
+  const getActive = () => {
+    const path = location.pathname;
+    let key = Object.keys(navs?.routes ?? {}).find(
+      (key) => navs?.routes[key] === path
+    );
+    return key;
+  };
+
   return (
     <div>
       <div
@@ -249,14 +305,15 @@ const Sidebar = ({ openSidebar, setOpenSidebar, drawer }) => {
       </div>
 
       <Menu
+        className="h-[calc(100vh-118px)] lg:h-[calc(100vh-53px)] overflow-auto"
         onClick={route}
         style={{
           minWidth: 240,
+          borderRight: "none",
         }}
-        defaultSelectedKeys={["5"]}
-        // defaultOpenKeys={["sub1"]}
+        selectedKeys={[getActive()]}
         mode="inline"
-        items={items}
+        items={navs?.navigation}
       />
     </div>
   );

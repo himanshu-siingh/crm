@@ -2,6 +2,6 @@
 
 ##### 12-Dec-2024
 
-- [ ] View Employee by department & Designation
-- [ ] Shows number of employees in specific department
-- [ ] Shows number of employees in specific designation
+- [x] View Employee by department & Designation
+- [x] Shows number of employees in specific department
+- [x] Shows number of employees in specific designation

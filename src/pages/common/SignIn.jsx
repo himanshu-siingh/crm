@@ -1,9 +1,27 @@
-import React from "react";
-import { Form, Input, Button, Checkbox } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button, Checkbox, notification } from "antd";
+import UserService from "../../services/request/user";
+import { useAuth } from "../../context/AuthContext";
 
 const SignInPage = () => {
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
   const onFinish = (values) => {
-    console.log("Success:", values);
+    setLoading(true);
+    UserService.getLogin(values, (res) => {
+      if (res.status) {
+        login(res);
+      } else {
+        notification.error({
+          message: "Invalid Credentials",
+          description:
+            "The username or password you entered is incorrect. Please try again.",
+          placement: "topRight",
+          duration: 5,
+        });
+      }
+      setLoading(false);
+    });
   };
 
   return (
@@ -53,6 +71,7 @@ const SignInPage = () => {
               type="primary"
               htmlType="submit"
               className="w-full bg-blue-600 hover:bg-blue-700"
+              loading={loading}
             >
               Sign In
             </Button>

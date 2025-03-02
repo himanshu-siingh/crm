@@ -39,3 +39,7 @@
 - [x] Implement Permission assignment to Roles
 - [ ] Implement Role Color Picker
 - [x] Implement Permission Creation and Deletion
+
+#### to run
+
+    npm run dev

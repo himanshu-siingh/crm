@@ -3,17 +3,37 @@ import Urls from "../url";
 
 const EmployeeService = {
   getDepartment: function (cb) {
-    APIService.post(Urls.getDepartment, {}, (res) => {
+    APIService.get(Urls.getDepartment, (res) => {
       cb(res);
     });
   },
   getDesignation: function (cb) {
-    APIService.post(Urls.getDesignation, {}, (res) => {
+    APIService.get(Urls.getDesignation, (res) => {
       cb(res);
     });
   },
   getEmployees: function (cb) {
     APIService.post(Urls.getEmployees, {}, (res) => {
+      cb(res);
+    });
+  },
+  getEmployeeProfile: function (param, cb) {
+    APIService.post(Urls.getEmployeeProfile, param, (res) => {
+      cb(res);
+    });
+  },
+  updateProfilePicture: function (param, cb) {
+    APIService.post(Urls.updateProfilePicture, param, (res) => {
+      cb(res);
+    });
+  },
+  updateBankDetail: function (param, cb) {
+    APIService.post(Urls.updateBankDetail, param, (res) => {
+      cb(res);
+    });
+  },
+  updateAddress: function (param, cb) {
+    APIService.post(Urls.updateAddress, param, (res) => {
       cb(res);
     });
   },
@@ -28,7 +48,7 @@ const EmployeeService = {
     });
   },
   getDesigDepart: function (cb) {
-    APIService.post(Urls.getDesigDepart, {}, (res) => {
+    APIService.get(Urls.getDesigDepart, (res) => {
       cb(res);
     });
   },

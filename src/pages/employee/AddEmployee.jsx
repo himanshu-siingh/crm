@@ -20,20 +20,23 @@ const AddEmployee = () => {
   const [index, setIndex] = useState();
 
   const handleSubmit = (values) => {
-    console.log("Form Values:", values);
+    //console.log("Form Values:", values);
     EmployeeService.addEmployee(values, (res) => {
       if (res.status) {
         message.success("Employee Added Succesfully");
         navigate("/employee");
+      } else {
+        message.error(res.message);
       }
     });
   };
 
-  console.log(form.department);
   useEffect(() => {
     EmployeeService.getDesigDepart((res) => {
       if (res.status) {
         setDeparts(res.data);
+      } else {
+        message.error(res.message);
       }
     });
   }, []);
@@ -43,7 +46,7 @@ const AddEmployee = () => {
       (department) => department.id === value
     );
     setIndex(selectedIndex);
-    console.log(selectedIndex); // or handle the index as needed
+    //console.log(selectedIndex); // or handle the index as needed
   };
 
   return (
@@ -63,14 +66,6 @@ const AddEmployee = () => {
           onFinish={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-          <Form.Item
-            label="Employee ID"
-            name="employeeId"
-            rules={[{ required: true, message: "Please enter Employee ID" }]}
-          >
-            <Input placeholder="Enter Employee ID" />
-          </Form.Item>
-
           <Form.Item
             label="Employee Name"
             name="employeeName"

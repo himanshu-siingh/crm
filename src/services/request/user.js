@@ -4,34 +4,36 @@ import SessionService from "../SessionService";
 
 const UserService = {
   getLogin: function (param, cb) {
-    //console.log(Urls.login);
     APIService.post(Urls.login, param, (res) => {
-      if (res.success) {
-        SessionService.set.loggedInUser(res.data.user);
-      }
       cb(res);
     });
   },
   getAllUser: function (param, cb) {
-    //console.log(Urls.login);
-    APIService.post(Urls.getAllUser, param, (res) => {
+    ////console.log(Urls.login);
+    APIService.get(Urls.getAllUser, (res) => {
       cb(res);
     });
   },
   getPastUser: function (param, cb) {
-    //console.log(Urls.login);
-    APIService.post(Urls.getPastUser, param, (res) => {
+    ////console.log(Urls.login);
+    APIService.get(Urls.getPastUser, (res) => {
       cb(res);
     });
   },
   createUser: function (param, cb) {
-    //console.log(Urls.login);
+    ////console.log(Urls.login);
     APIService.post(Urls.createUser, param, (res) => {
       cb(res);
     });
   },
+  updatePassword: function (param, cb) {
+    ////console.log(Urls.login);
+    APIService.post(Urls.updatePassword, param, (res) => {
+      cb(res);
+    });
+  },
   getAllRoles: function (cb) {
-    APIService.post(Urls.getAllRoles, {}, (res) => {
+    APIService.get(Urls.getAllRoles, (res) => {
       cb(res);
     });
   },
@@ -73,12 +75,6 @@ const UserService = {
   },
   assignPermission: function (param, cb) {
     APIService.post(Urls.assignPermission, param, (res) => {
-      cb(res);
-    });
-  },
-
-  changePassword: function (param, cb) {
-    APIService.post(Urls.changePassword, param, (res) => {
       cb(res);
     });
   },

@@ -3,16 +3,45 @@ import SessionService from "./SessionService";
 
 const APIService = {
   get: async function (url, cb) {
-    const response = await axios.get(url);
-    cb(response.data);
+    await axios
+      .get(url, {
+        headers: `Authorization : Bearer ${SessionService.get.header()}`,
+      })
+      .then((response) => {
+        cb(response.data);
+      })
+      .catch((err) => {
+        cb({ status: 0, message: err.response?.data?.message });
+      });
   },
   post: async function (url, param, cb) {
-    const response = await axios.post(url, param, {
-      //   headers: {
-      //     Authorization: SessionService.get.header(),
-      //   },
-    });
-    cb(response.data);
+    await axios
+      .post(url, param, {
+        headers: {
+          Authorization: `Bearer ${SessionService.get.header()}`,
+        },
+      })
+      .then((response) => {
+        cb(response.data);
+      })
+      .catch((err) => {
+        cb({ status: 0, message: err.response?.data?.message });
+      });
+  },
+  postUploader: async function (url, param, cb) {
+    await axios
+      .post(url, param, {
+        headers: {
+          Authorization: `Bearer ${SessionService.get.header()}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        cb(response.data);
+      })
+      .catch((err) => {
+        cb({ status: 0, message: err.response?.data?.message });
+      });
   },
 };
 

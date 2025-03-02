@@ -1,9 +1,11 @@
 import {
   Button,
   Checkbox,
+  Form,
   Input,
   message,
   Modal,
+  Select,
   Space,
   Table,
   Tag,
@@ -13,16 +15,24 @@ const { Text, Title } = Typography;
 import React, { useEffect, useState } from "react";
 import { UserAddOutlined } from "@ant-design/icons";
 import UserService from "../../services/request/user";
+import { useForm } from "antd/es/form/Form";
 
-const RoleCreation = ({ isModalOpen, handleOk, handleCancel, setLoad }) => {
-  const [role, setRole] = useState();
-  const createRole = () => {
-    UserService.createRole({ role }, (res) => {
+const RoleCreation = ({
+  isModalOpen,
+  handleOk,
+  handleCancel,
+  setLoad,
+  roles,
+}) => {
+  const [form] = useForm();
+  const handleSubmit = (values) => {
+    UserService.createRole(values, (res) => {
       if (res.status) {
-        setRole();
         setLoad((load) => !load);
+        form.resetFields();
         handleOk();
       } else {
+        message.error(res.message);
       }
     });
   };
@@ -32,27 +42,38 @@ const RoleCreation = ({ isModalOpen, handleOk, handleCancel, setLoad }) => {
       title="Create Role"
       open={isModalOpen}
       onOk={handleOk}
-      onCancel={handleCancel}
-      footer={[
-        <Button key="back" onClick={handleCancel}>
-          Cancel
-        </Button>,
-        <Button key="submit" type="primary" onClick={createRole}>
-          Create
-        </Button>,
-      ]}
+      onCancel={() => {
+        form.resetFields();
+        handleCancel();
+      }}
+      footer={[]}
     >
       <p>Role creation form here</p>
+
       <div className="py-5">
-        <Title level={5}>
-          Role <span className="text-red-600">*</span>
-        </Title>
-        <Input
-          value={role}
-          onChange={({ target }) => setRole(target.value)}
-          placeholder="Ex- manager"
-          className="py-1"
-        />
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            label="Role"
+            name="role"
+            rules={[{ required: true, message: "Please enter role name" }]}
+          >
+            <Input placeholder="Role" />
+          </Form.Item>
+          <Form.Item label="Inherit Permission" name="parent">
+            <Select
+              options={roles.map((role) => {
+                return { value: role.id, label: role.role };
+              })}
+              placeholder="Select Parent"
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </Modal>
   );
@@ -76,7 +97,7 @@ const PermissionAssign = ({
         setPermission(
           res.data.map((r) => {
             if (r.isSelected) check.push(r.id);
-            return { label: `${r.permission} - ${r.pageId}`, value: r.id };
+            return { label: r.permission_name, value: r.id };
           })
         );
         setCheckedList(check);
@@ -84,6 +105,8 @@ const PermissionAssign = ({
         setIndeterminate(
           check.length > 0 && !(res.data.length === check.length)
         );
+      } else {
+        message.error(res.message);
       }
     });
   }, [permissionRole]);
@@ -156,6 +179,7 @@ const PermissionAssign = ({
 
 const Roles = () => {
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [permissionRole, setPermissionRole] = useState();
@@ -183,12 +207,24 @@ const Roles = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     UserService.getAllRoles((res) => {
+      setLoading(false);
       if (res.status) {
         setRows(res.data);
+        //console.log(res.data);
+      } else {
+        message.error(res.message);
       }
     });
   }, [load]);
+
+  const getPermissionName = (permissions) => {
+    var names = permissions.map((permission) => {
+      return <Tag>{permission.permission}</Tag>;
+    });
+    return names;
+  };
 
   const columns = [
     {
@@ -201,16 +237,17 @@ const Roles = () => {
       dataIndex: "role",
       key: "role",
     },
-    // {
-    //   title: "Permission",
-    //   key: "permission",
-    //   dataIndex: "permission",
-    //   render: (_, { permission }) => {
-    //     return permission.map((permission) => {
-    //       return <Tag>{permission.name}</Tag>;
-    //     });
-    //   },
-    // },
+    {
+      title: "Inheritance",
+      dataIndex: "parent",
+      key: "parent",
+    },
+    {
+      title: "Permission",
+      key: "permission",
+      dataIndex: "permission",
+      render: (permission) => getPermissionName(permission),
+    },
     {
       title: "Action",
       key: "id",
@@ -219,7 +256,7 @@ const Roles = () => {
         return (
           <Space>
             <Button
-              type="fn"
+              type="link"
               onClick={() => showPermissionModal(id)}
               className="text-blue-400 hover:text-blue-700"
             >
@@ -246,13 +283,16 @@ const Roles = () => {
           </Button>
         </div>
       </div>
-      <div style={{ overflowX: "auto", maxWidth: "84vw" }}>
+      <div
+        style={{ overflowX: "auto" }}
+        className="lg:max-w-[calc(100vw-290px)] max-w-[calc(100vw-40px)]"
+      >
         <Table
           className="mt-5"
           columns={columns}
           dataSource={rows}
+          loading={loading}
           pagination={{
-            // pageSize: 5,
             defaultPageSize: 5,
             pageSizeOptions: [5, 10, 20],
             showTotal: (total) => `Total ${total} roles`,
@@ -267,6 +307,7 @@ const Roles = () => {
         handleOk={handleRoleOk}
         handleCancel={handleRoleCancel}
         setLoad={setLoad}
+        roles={rows}
       />
 
       <PermissionAssign

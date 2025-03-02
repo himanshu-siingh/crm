@@ -1,11 +1,12 @@
 const base_url = `http://${window.location.hostname}:3110/api`;
-// const base_url = `https://apic-45dr.onrender.com/api`;
+// const base_url = `https://crm-api-d9r9.onrender.com/api`;
 
 const Urls = {
   login: base_url + "/login",
   getAllUser: base_url + "/user/view",
   getPastUser: base_url + "/user/past",
   createUser: base_url + "/user/create",
+  updatePassword: base_url + "/user/updatePassword",
   getAllRoles: base_url + "/roles",
   createRoles: base_url + "/role/create",
   getRole: base_url + "/role/get",
@@ -20,12 +21,32 @@ const Urls = {
   getEmployees: base_url + "/employees",
   addEmployee: base_url + "/employee/add",
   getEmployeeByDepart: base_url + "/employee/department",
+  getEmployeeProfile: base_url + "/employee/profile",
+  updateProfilePicture: base_url + "/employee/profile/picture",
+  updateBankDetail: base_url + "/employee/bankDetail",
+  updateAddress: base_url + "/employee/address",
   deleteDepartment: base_url + "/department/delete",
   createDepartment: base_url + "/department/add",
   getDesigDepart: base_url + "/department/designation",
   getDesignation: base_url + "/designation",
   deleteDesignation: base_url + "/designation/delete",
   createDesignation: base_url + "/designation/add",
+  getLeads: base_url + "/leads",
+  addLeads: base_url + "/lead/add",
+  addFollowUp: base_url + "/lead/followup",
+  getMeeting: base_url + "/lead/meeting",
+  getLeadProfile: base_url + "/lead/profile",
+  getClosedMeeting: base_url + "/lead/meeting/closed",
+  addMeeting: base_url + "/lead/meeting/add",
+  closeMeeting: base_url + "/lead/meeting/close",
+  updateLogo: base_url + "/lead/logo",
+  compilePug: base_url + "/template/compile",
+  saveTemplate: base_url + "/template/save",
+  getAllTemplate: base_url + "/template/all",
+  getAllGroups: base_url + "/groups",
+  addGroup: base_url + "/groups/add",
+  getGroup: base_url + "/groups/get",
+  assignUserToGroup: base_url + "/groups/assign",
 };
 
 export default Urls;

@@ -1,59 +1,33 @@
 import React, { useRef, useState } from "react";
-
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import logo from "../images/logo.png";
 import Topbar from "./topbar";
 import Sidebar from "./sidebar";
-import Footer from "./footer";
-import { Button, Drawer, Tour } from "antd";
+import { Button, Drawer } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import "./layout.css";
+import Breadcrumb from "./Breadcrumb";
 const Layout = () => {
   const [openSidebar, setOpenSidebar] = useState(false);
-  const ref1 = useRef(null);
-  const ref2 = useRef(null);
-  const ref3 = useRef(null);
-  const [open, setOpen] = useState(false);
+
   const onClose = () => {
     setOpenSidebar(false);
   };
 
-  const steps = [
-    {
-      title: "Side Navigation",
-      description: "Used to navigate throughout application",
-      target: () => ref1.current,
-    },
-    {
-      title: "Top Navigation",
-      description: "Have Search bar and profile",
-      target: () => ref2.current,
-    },
-    {
-      title: "Content Area",
-      description: "This is where actual content will show",
-      target: () => ref3.current,
-    },
-  ];
   return (
     <>
       <div className="flex flex-row">
-        <div
-          className="h-[100vh] lg:block hidden overflow-auto border-r-2 min-w-[240px]"
-          ref={ref1}
-        >
+        <div className="lg:block hidden border-r-2 min-w-[250px]">
           <Sidebar />
         </div>
 
         <div className="flex-auto">
-          <div ref={ref2}>
+          <div>
             <Topbar setOpenSidebar={setOpenSidebar} />
+            <Breadcrumb />
           </div>
 
-          <div
-            ref={ref3}
-            className="p-5 overflow-auto max-h-[87vh] content-area"
-          >
+          <div className="px-5 py-2 overflow-auto max-h-[calc(100vh-110px)] content-area">
             <Outlet />
           </div>
           {/* <Footer /> */}
@@ -61,7 +35,8 @@ const Layout = () => {
       </div>
       <div className="lg:hidden ">
         <Drawer
-          title={<img src={logo} width={150} alt="Seenarise" />}
+          title={<img src={logo} width={150} alt="Seemarise" />}
+          width={284}
           placement={"left"}
           closable={false}
           size="default"
@@ -87,7 +62,6 @@ const Layout = () => {
             drawer={true}
           />
         </Drawer>
-        <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
       </div>
     </>
   );

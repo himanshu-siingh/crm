@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Button, Table, Modal, Input, Select, message } from "antd";
+import {
+  Typography,
+  Button,
+  Table,
+  Modal,
+  Input,
+  Select,
+  message,
+  Popover,
+  Popconfirm,
+} from "antd";
 import EmployeeService from "../../services/request/employee";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 const { Title, Text } = Typography;
-
-const sample = [
-  { id: 1, name: "SDE - 1", department: "Development", totalEmployee: 12 },
-  { id: 1, name: "SDE Trainee", department: "Development", totalEmployee: 50 },
-  { id: 1, name: "SDE - 2", department: "Development", totalEmployee: 33 },
-];
 
 const AddDesignation = ({
   isModalOpen,
@@ -59,7 +64,7 @@ const AddDesignation = ({
         </Title>
         <Select
           showSearch
-          placeholder="Select a person"
+          placeholder="Select Department"
           optionFilterProp="label"
           value={formdata?.departmentId}
           onChange={(value) =>
@@ -100,10 +105,12 @@ const AddDesignation = ({
 };
 
 const DesignationList = () => {
-  const [rows, setRows] = useState(sample);
+  const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [load, setLoad] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [department, setDepartment] = useState([]);
+  const { hasPermission } = useAuth();
   const navigate = useNavigate();
 
   const closeModal = () => {
@@ -123,7 +130,8 @@ const DesignationList = () => {
       render: (text, row) => {
         return (
           <Button
-            type="th"
+            type="link"
+            className="text-black"
             onClick={() => {
               navigate("/employee/department", {
                 state: { data: row },
@@ -146,39 +154,55 @@ const DesignationList = () => {
       key: "totalEmployee",
     },
     {
+      title: "Action",
       dataIndex: "id",
       key: "id",
-      render: (id, record) => (
-        <Button
-          type="fgg"
-          className=" hover:text-blue-700"
-          onClick={() => {
-            EmployeeService.deleteDesignation({ id }, (res) => {
-              if (res.status) {
-                setLoad((x) => !x);
-                message.success("Designation Deleted Successfully");
-              } else {
-                message.error("Error");
-              }
-            });
-          }}
-        >
-          Delete
-        </Button>
+      render: (id) => (
+        <>
+          {hasPermission("delete:designation") && (
+            <Popconfirm
+              title="Delete the Designation"
+              description="Are you sure to delete this designation?"
+              onConfirm={() => {
+                EmployeeService.deleteDesignation({ id }, (res) => {
+                  if (res.status) {
+                    setLoad((x) => !x);
+                    message.success("Designation Deleted Successfully");
+                  } else {
+                    message.error(res.message);
+                  }
+                });
+              }}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Text className="text-blue-400 hover:text-blue-700 cursor-pointer">
+                Delete
+              </Text>
+            </Popconfirm>
+          )}
+        </>
       ),
     },
   ];
 
   useEffect(() => {
+    setLoading(true);
     EmployeeService.getDesignation((res) => {
-      console.log(res);
-      setRows(res.data);
+      setLoading(false);
+      if (res.status) {
+        setRows(res.data);
+      } else {
+        message.error(res.message);
+      }
     });
   }, [load]);
   useEffect(() => {
     EmployeeService.getDepartment((res) => {
       if (res.status) {
         setDepartment(res.data);
+      } else {
+        message.error(`${res.message} for department`);
       }
     });
   }, []);
@@ -192,29 +216,30 @@ const DesignationList = () => {
           <Text type="secondary">View all available Designation</Text>
         </div>
         <div>
-          <Button
-            color="primary"
-            variant="outlined"
-            onClick={() => setOpen(true)}
-          >
-            + Add Designation
-          </Button>
+          {hasPermission("add:designation") && (
+            <Button
+              color="primary"
+              variant="outlined"
+              onClick={() => setOpen(true)}
+            >
+              + Add Designation
+            </Button>
+          )}
         </div>
       </div>
-      <div style={{ overflowX: "auto", maxWidth: "88vw" }}>
+      <div style={{ overflowX: "auto" }} className="max-w-[calc(100vw-40px)]">
         <Table
           className="mt-5"
           columns={columns}
           dataSource={rows}
-          //   pagination={{
-          //     // pageSize: 5,
-          //     defaultPageSize: 10,
-          //     pageSizeOptions: [10, 25, 50],
-          //     showTotal: (total) => `Total ${total} users`,
-          //     showQuickJumper: true,
-          //     showSizeChanger: true,
-          //   }}
-          //   loading={loading}
+          pagination={{
+            defaultPageSize: 10,
+            pageSizeOptions: [10, 25, 50],
+            showTotal: (total) => `Total ${total} Designation`,
+            showQuickJumper: true,
+            showSizeChanger: true,
+          }}
+          loading={loading}
         />
       </div>
       <AddDesignation
