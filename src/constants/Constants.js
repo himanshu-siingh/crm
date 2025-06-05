@@ -68,3 +68,37 @@ export const MeetingStatus = {
   3: "Rescheduled",
   4: "Completed",
 };
+
+export const BankNames = [
+  { "label": "State Bank of India", "value": "State Bank of India" },
+  { "label": "HDFC Bank", "value": "HDFC Bank" },
+  { "label": "ICICI Bank", "value": "ICICI Bank" },
+  { "label": "Punjab National Bank", "value": "Punjab National Bank" },
+  { "label": "Axis Bank", "value": "Axis Bank" },
+  { "label": "Bank of Baroda", "value": "Bank of Baroda" },
+  { "label": "Canara Bank", "value": "Canara Bank" },
+  { "label": "Union Bank of India", "value": "Union Bank of India" },
+  { "label": "IDFC FIRST Bank", "value": "IDFC FIRST Bank" },
+  { "label": "Kotak Mahindra Bank", "value": "Kotak Mahindra Bank" },
+  { "label": "IndusInd Bank", "value": "IndusInd Bank" },
+  { "label": "Yes Bank", "value": "Yes Bank" },
+  { "label": "Bank of India", "value": "Bank of India" },
+  { "label": "Indian Bank", "value": "Indian Bank" },
+  { "label": "Central Bank of India", "value": "Central Bank of India" },
+  { "label": "UCO Bank", "value": "UCO Bank" },
+  { "label": "Bank of Maharashtra", "value": "Bank of Maharashtra" },
+  { "label": "Indian Overseas Bank", "value": "Indian Overseas Bank" },
+  { "label": "Punjab & Sind Bank", "value": "Punjab & Sind Bank" },
+  { "label": "Federal Bank", "value": "Federal Bank" },
+  { "label": "South Indian Bank", "value": "South Indian Bank" },
+  { "label": "RBL Bank", "value": "RBL Bank" },
+  { "label": "Karur Vysya Bank", "value": "Karur Vysya Bank" },
+  { "label": "DCB Bank", "value": "DCB Bank" },
+  { "label": "Jammu & Kashmir Bank", "value": "Jammu & Kashmir Bank" },
+  { "label": "Tamilnad Mercantile Bank", "value": "Tamilnad Mercantile Bank" },
+  { "label": "City Union Bank", "value": "City Union Bank" },
+  { "label": "Saraswat Bank", "value": "Saraswat Bank" },
+  { "label": "AU Small Finance Bank", "value": "AU Small Finance Bank" },
+  { "label": "Equitas Small Finance Bank", "value": "Equitas Small Finance Bank" }
+];
+

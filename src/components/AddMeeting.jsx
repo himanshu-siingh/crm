@@ -10,8 +10,13 @@ import {
 } from "antd";
 import LeadService from "../services/request/leads";
 import { meetingModes } from "../constants/Constants";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 const AddMeeting = ({ form, disabled, finish }) => {
+  const [selectedDate, setSelectedDate] = useState(null);
   const [leadsoption, setLeads] = useState([]);
   useEffect(() => {
     LeadService.getLeads((res) => {
@@ -34,6 +39,26 @@ const AddMeeting = ({ form, disabled, finish }) => {
         message.error(res.message);
       }
     });
+  };
+
+  const getDisabledHours = () => {
+    const now = dayjs();
+    if (selectedDate && selectedDate.isSame(now, "day")) {
+      return Array.from({ length: now.hour() }, (_, i) => i);
+    }
+    return [];
+  };
+
+  const getDisabledMinutes = (selectedHour) => {
+    const now = dayjs();
+    if (
+      selectedDate &&
+      selectedDate.isSame(now, "day") &&
+      selectedHour === now.hour()
+    ) {
+      return Array.from({ length: now.minute() }, (_, i) => i);
+    }
+    return [];
   };
 
   return (
@@ -83,7 +108,11 @@ const AddMeeting = ({ form, disabled, finish }) => {
           name="date"
           rules={[{ required: true, message: "Please choose a date!" }]}
         >
-          <DatePicker className="w-full" />
+          <DatePicker
+            onChange={(date) => setSelectedDate(date)}
+            minDate={dayjs()}
+            className="w-full"
+          />
         </Form.Item>
 
         {/* Meeting Time */}
@@ -92,7 +121,11 @@ const AddMeeting = ({ form, disabled, finish }) => {
           name="time"
           rules={[{ required: true, message: "Please choose a time!" }]}
         >
-          <TimePicker className="w-full" />
+          <TimePicker
+            disabledHours={getDisabledHours}
+            disabledMinutes={getDisabledMinutes}
+            className="w-full"
+          />
         </Form.Item>
 
         {/* Meeting Mode */}
@@ -110,10 +143,10 @@ const AddMeeting = ({ form, disabled, finish }) => {
           name="link"
           rules={[
             {
-              required: true,
+              required: meetingModes[4].value !== "in_person",
               message: "Please enter the meeting link!",
               type: "url",
-              warningOnly: true,
+              // warningOnly: true,
             },
           ]}
         >

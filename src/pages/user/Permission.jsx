@@ -22,12 +22,15 @@ const PermissionCreation = ({
   setLoad,
 }) => {
   const [form] = Form.useForm();
+  const [loading,setLoading] = useState(false)
   const addPermission = (values) => {
+    setLoading(true);
     UserService.createPermission(values, (res) => {
       if (res.status) {
         message.success("Permission added Succesfully");
         setLoad((x) => !x);
         form.resetFields();
+        setLoading(false)
         handleOk();
       } else {
         message.error(res.message);
@@ -66,7 +69,7 @@ const PermissionCreation = ({
             <Input placeholder="Ex- add:employee" className="py-1" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button loading={loading} type="primary" htmlType="submit">
               Create Permission
             </Button>
           </Form.Item>

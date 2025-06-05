@@ -25,11 +25,14 @@ const RoleCreation = ({
   roles,
 }) => {
   const [form] = useForm();
+  const[loading,setLoading] = useState(false)
   const handleSubmit = (values) => {
+    setLoading(true);
     UserService.createRole(values, (res) => {
       if (res.status) {
         setLoad((load) => !load);
         form.resetFields();
+        setLoading(false);
         handleOk();
       } else {
         message.error(res.message);
@@ -69,7 +72,7 @@ const RoleCreation = ({
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" loading={loading} htmlType="submit">
               Submit
             </Button>
           </Form.Item>

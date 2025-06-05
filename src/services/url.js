@@ -47,6 +47,7 @@ const Urls = {
   addGroup: base_url + "/groups/add",
   getGroup: base_url + "/groups/get",
   assignUserToGroup: base_url + "/groups/assign",
+  // getBankDetails:base_url+"/bankdetails",
 };
 
 export default Urls;

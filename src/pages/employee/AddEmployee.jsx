@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { print_city, print_state } from "../../../cities.js";
 import {
   Form,
   Input,
@@ -12,12 +13,17 @@ import EmployeeService from "../../services/request/employee";
 import { useNavigate } from "react-router-dom";
 const { Title, Text } = Typography;
 const { Option } = Select;
+import { Country, State, City } from "country-state-city";
+import { BankNames } from "../../constants/Constants.js";
 
 const AddEmployee = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [departs, setDeparts] = React.useState([]);
+  const [state, setState] = useState();
+  const [stateCode, setStateCode] = useState();
   const [index, setIndex] = useState();
+  const [cities, setCities] = useState();
 
   const handleSubmit = (values) => {
     //console.log("Form Values:", values);
@@ -32,9 +38,24 @@ const AddEmployee = () => {
   };
 
   useEffect(() => {
+    setCities(City.getCitiesOfState("IN", stateCode));
+  }, [stateCode]);
+
+  // useEffect(()=>{
+  //   EmployeeService.getBankDetails((res)=>{
+  //     if(res.status){
+  //       console.log(res);
+  //     }else{
+  //       console.log("not working");
+  //     }
+  //   })
+  // })
+
+  useEffect(() => {
     EmployeeService.getDesigDepart((res) => {
       if (res.status) {
         setDeparts(res.data);
+        setState(State.getStatesOfCountry("IN"));
       } else {
         message.error(res.message);
       }
@@ -173,6 +194,41 @@ const AddEmployee = () => {
             rules={[{ required: true, message: "Please enter PAN Number" }]}
           >
             <Input placeholder="Enter PAN Number" />
+          </Form.Item>
+
+          <Form.Item
+            label="State"
+            name="state"
+            rules={[{ required: true, message: "Please select a State" }]}
+          >
+            <Select
+              onChange={(e) => setStateCode(e)}
+              placeholder="Select State"
+            >
+              {state?.map((s) => {
+                return <option value={s.isoCode}>{s.name}</option>;
+              })}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="City"
+            name="city"
+            rules={[{ required: true, message: "Please select a City" }]}
+          >
+            <Select placeholder="Select City">
+              {cities?.map((c) => {
+                return <option value={c.name}>{c.name}</option>;
+              })}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Bank"
+            name="bank"
+            rules={[{ required: true, message: "Please select a Bank" }]}
+          >
+            <Select placeholder="Select Bank" options={BankNames} />
           </Form.Item>
 
           <div className="md:col-span-2 flex justify-end">

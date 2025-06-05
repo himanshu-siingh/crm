@@ -114,7 +114,7 @@ const DepartmentList = () => {
       title: "Action",
       dataIndex: "id",
       key: "id",
-      render: (id) => (
+      render: (id,record) => (
         <>
           {hasPermission("delete:department") && (
             <Popconfirm
@@ -133,7 +133,7 @@ const DepartmentList = () => {
                 });
               }}
             >
-              <Text className="text-blue-400 hover:text-blue-700 cursor-pointer">
+              <Text style={{pointerEvents:record.totalEmployee ==0 ? "auto":"none",color:record.totalEmployee ==0 ? "":"gray"}}className="text-blue-400 hover:text-blue-700 cursor-pointer">
                 Delete
               </Text>
             </Popconfirm>

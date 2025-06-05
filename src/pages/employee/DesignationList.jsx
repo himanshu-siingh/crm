@@ -157,7 +157,7 @@ const DesignationList = () => {
       title: "Action",
       dataIndex: "id",
       key: "id",
-      render: (id) => (
+      render: (id,row) => (
         <>
           {hasPermission("delete:designation") && (
             <Popconfirm
@@ -176,7 +176,7 @@ const DesignationList = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Text className="text-blue-400 hover:text-blue-700 cursor-pointer">
+              <Text style={{pointerEvents:row.totalEmployee == 0 ? "auto":"none", color:row.totalEmployee == 0 ? "":"gray" }} className="text-blue-400 hover:text-blue-700 cursor-pointer">
                 Delete
               </Text>
             </Popconfirm>
