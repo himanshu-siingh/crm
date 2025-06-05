@@ -72,6 +72,11 @@ const EmployeeService = {
       cb(res);
     });
   },
+  // getBankDetails:function(cb){
+  //   APIService.get(Urls.getBankDetails,(res)=>{
+  //     cb(res);
+  //   })
+  // }
 };
 
 export default EmployeeService;

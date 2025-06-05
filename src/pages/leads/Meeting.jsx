@@ -17,9 +17,12 @@ import ReactQuill from "react-quill";
 import quillConfig from "../../extras/quillConfig";
 import { useAuth } from "../../context/AuthContext";
 const { Text, Title } = Typography;
+import dayjs from 'dayjs';
+
 
 const CloseMeeting = ({ handleClose, meeting, setLoad }) => {
   const [form] = Form.useForm();
+  const [loading,setLoading] = useState(false);
   const handleSubmit = (values) => {
     var mode = "";
     if (meeting.mode != "in_person" && meeting.mode != "video_call") {
@@ -34,10 +37,12 @@ const CloseMeeting = ({ handleClose, meeting, setLoad }) => {
       mode: mode,
       notes: values.comments,
     };
+    setLoading(true)
     LeadService.closeMeeting(param, (res) => {
       if (res.status) {
         message.success("Meeting Closed Successfully");
         setLoad((v) => !v);
+        setLoading(false);
         handleClose();
       } else {
         message.error(res.message);
@@ -55,7 +60,7 @@ const CloseMeeting = ({ handleClose, meeting, setLoad }) => {
         />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit">
+        <Button type="primary" loading={loading} htmlType="submit">
           Submit
         </Button>
       </Form.Item>
@@ -64,12 +69,15 @@ const CloseMeeting = ({ handleClose, meeting, setLoad }) => {
 };
 const RescheduleMeeting = ({ handleClose, meeting, setLoad }) => {
   const [form] = Form.useForm();
+  const [loading,setLoading] = useState(false)
   const handleSubmit = (values) => {
     //console.log({ ...values, ...meeting });
+    setLoading(true)
     LeadService.addMeeting({ ...values, ...meeting }, (res) => {
       if (res.status) {
         message.success("Meeting Rescheduled Successfully");
         setLoad((v) => !v);
+        setLoading(false);
         handleClose();
       } else {
         message.error(res.message);
@@ -96,7 +104,7 @@ const RescheduleMeeting = ({ handleClose, meeting, setLoad }) => {
         <TimePicker className="w-full" />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit">
+        <Button loading={loading} type="primary" htmlType="submit">
           Submit
         </Button>
       </Form.Item>
