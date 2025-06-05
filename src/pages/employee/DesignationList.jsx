@@ -23,21 +23,24 @@ const AddDesignation = ({
   setLoad,
 }) => {
   const [formdata, setFormdata] = useState();
-
+  const [loading, setLoading] = useState(false);
   const mappedData = department.map((item) => ({
     value: item.id,
     label: item.name,
   }));
 
   const create = () => {
+    setLoading(true)
     EmployeeService.createDesignation(formdata, (res) => {
       if (res.status) {
         setFormdata();
         message.success("Designation Added");
         setLoad((x) => !x);
+        setLoading(false)
         handleOk();
       } else {
         message.error("Error Adding Designation");
+        setLoading(false)
       }
     });
   };
@@ -52,7 +55,7 @@ const AddDesignation = ({
         <Button key="back" onClick={handleCancel}>
           Return
         </Button>,
-        <Button key="submit" type="primary" onClick={create}>
+        <Button key="submit" type="primary" loading={loading} onClick={create}>
           Submit
         </Button>,
       ]}

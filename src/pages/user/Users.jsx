@@ -38,12 +38,12 @@ const UserCreation = React.memo(
       setLoading(true);
       UserService.createUser({ ...values, email: email }, (res) => {
         var type, content;
+          setLoading(false);
         if (res.status) {
           type = "success";
           content = "User created successfully";
           form.resetFields();
           setLoad((x) => !x);
-          setLoading(false);
           setIsAdmin(false);
           handleOk();
         } else {
