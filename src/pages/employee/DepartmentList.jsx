@@ -15,18 +15,24 @@ const { Title, Text } = Typography;
 
 const AddDepartment = ({ isModalOpen, handleCancel, handleOk, setLoad }) => {
   const [depart, setDepart] = useState();
+  const [loadingAdd, setLoadingAdd] = useState(false);
 
   const create = () => {
+
+setLoadingAdd(true)
     EmployeeService.createDepartment({ name: depart }, (res) => {
       if (res.status) {
         setDepart();
         message.success("Department Created Successfully");
         setLoad((x) => !x);
+        setLoadingAdd(false)
         handleOk();
       } else {
         message.error(res.message);
+        setLoadingAdd(false)
       }
     });
+  
   };
 
   return (
@@ -39,7 +45,7 @@ const AddDepartment = ({ isModalOpen, handleCancel, handleOk, setLoad }) => {
         <Button key="back" onClick={handleCancel}>
           Return
         </Button>,
-        <Button key="submit" type="primary" onClick={create}>
+        <Button key="submit" type="primary" loading={loadingAdd} onClick={create}>
           Submit
         </Button>,
       ]}

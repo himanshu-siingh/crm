@@ -86,7 +86,7 @@ const Employee = () => {
           <Title level={4} style={{ margin: 0 }}>
             Employees
           </Title>
-          <Text type="secondary">View all available Designation</Text>
+          <Text type="secondary">View all available Employees</Text>
         </div>
         <Space className="flex flex-wrap-reverse items-center">
           <div>
